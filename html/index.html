@@ -1,0 +1,67 @@
+<!doctype html>
+<html ng-app="LunApp">
+<head>
+  <meta charset="utf-8">
+  <title>Verdensteaterveven</title>
+  <script src="angular.min.js"></script>
+  <script src="much.js"></script>
+  <link rel="stylesheet" href="very.css">
+</head>
+<body ng-controller="FilmCtrl">
+  
+  <ul id="film_list">
+    <li ng-repeat="film in films">
+      <img id="{{film.id}}" class="thumbnail" ng-click="display(film)" title="{{film.title}}" src="images/{{film.id}}.jpg"/>
+      <span style="font-size:0px"><a href="" ng-click="display(film)">{{film.title}}</a></span><!-- Ctrl-F search -->
+    </li>
+  </ul>
+  
+  <div class="clearfix" id="main_display" ng-show="displayed_film != null">
+    <h1><a id="title" href="films/{{displayed_film.pathname}}">{{displayed_film.title}}</a><span id="year">({{year_interval(displayed_film)}})</span></h1>
+    <div class="clearfix" id="inner_display">
+      <img class="poster" src="images/{{displayed_film.id}}.jpg"/>
+      <ul id="info_list">
+        <li>
+          <span id="plot">{{displayed_film.plot}}</span>
+        </li>
+        <li id="ratings">
+          <a class="rating_box" id="imdbrating" href="http://imdb.com/title/{{displayed_film.imdbid}}">
+            <span>{{displayed_film.imdbrating.toFixed(1)}}</span>
+          </a>
+          <div id="tomatogroup" ng-show="displayed_film.tomatoimage != null">
+            <div class="rating_box" id="tomatorating">
+              <img src="icons/{{displayed_film.tomatoimage}}.png"/>
+              <span>{{displayed_film.tomatometer}}%</span>
+            </div>
+            <div class="rating_box" id="tomatouser">
+              <img src="icons/{{evalUserMeter(displayed_film.tomatousermeter)}}-usermeter.png"/>
+              <span>{{displayed_film.tomatousermeter}}%</span>
+            </div>
+          </div>
+          <div style="background-color: {{evalMetascore(displayed_film.metascore)}}" class="rating_box" id="metascore" ng-show="displayed_film.metascore != null">
+            <span>{{displayed_film.metascore}}</span>
+          </div>
+        </li>
+        <li>
+          <span id="consensus">{{displayed_film.tomatoconsensus}}</span>
+        </li>
+        <li>
+          <a id="awards" href="http://imdb.com/title/{{displayed_film.imdbid}}/awards">{{displayed_film.awards}}</a>
+        </li>
+      </ul>
+    </div>
+    <div id="film_listing">
+      <ul ng-repeat="(dir, files) in listing">
+        <li class="header">
+          <a href="vlc://{{domain}}/films/{{dir}}">{{decodeURL(dir)}}</a>
+        </li>
+        <li ng-repeat="file in files">
+          <a href="vlc://{{domain}}/films/{{dir}}/{{file}}">{{decodeURL(file)}}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+</body>
+
+</html>

@@ -1,0 +1,139 @@
+html, body {
+  margin: 0;
+  height: 100%;
+}
+.clearfix{
+  overflow: auto;
+}
+
+/*div {
+  border: 1px dotted black;
+}*/
+
+#film_list{
+  list-style-type: none;
+}
+#film_list li{
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.thumbnail{
+  cursor: pointer;
+  height: 80px;
+  max-width: 80px;
+}
+
+
+#main_display{
+  position: fixed;
+  top: 2%;
+  left: 225px;
+  max-height: 97%;
+}
+
+#title{
+  color: black;
+}
+#year{
+  color: gray;
+  margin-left: 1em;
+}
+
+#inner_display{
+  position: relative;
+}
+
+#info_list{
+  list-style-type: none;
+}
+
+.poster{
+  float: left;
+  margin-right: 2em;
+}
+
+#plot{
+  font-size: x-large;
+  font-weight: bold;
+}
+
+#ratings{
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.rating_box{
+  display: inline-block;
+  margin: 2em;
+}
+.rating_box span{
+  font-size: medium;
+  font-weight: bold;
+}
+.rating_box img{
+  display: inline;
+  vertical-align: middle;
+}
+
+#imdbrating{
+  background-image: url(icons/star.png);
+  background-repeat: no-repeat;
+  height: 57px;
+  width: 65px;
+  text-align: center;
+  line-height: 4em;
+  text-decoration: none;
+  color: black;
+}
+
+#tomatogroup{
+  display: inline;
+}
+
+#metascore{
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  line-height: 3em;
+}
+#metascore span{
+  color: white;
+}
+
+#consensus{
+  font-size: large;
+  font-weight: bold;
+}
+
+#awards{
+  font-size: medium;
+  font-weight: bold;
+  line-height: 3em;
+  color:black;
+  text-decoration: none;
+}
+
+
+#film_listing{
+  position: relative;
+  margin-top: 1em;
+}
+#film_listing ul{
+  display: inline-block;
+  list-style-type: none;
+  vertical-align: top;
+}
+#film_listing ul li{
+  font-size: large;
+  font-variant: small-caps;
+  margin: 3px;
+}
+#film_listing ul li.header{
+  margin: 1em;
+  font-size: large;
+  font-weight: bold;
+}
+#film_listing ul li a{
+  color: black;
+}
