@@ -17,7 +17,7 @@ angular.module('LunApp', [])
   var films = $scope.films = [];
   $http({
     headers: {'Content-Type': 'application/json'},
-    url: 'cgi-bin/list_films.py',
+    url: '/cgi-bin/list_films.py',
     method: "GET",
     params: {
     }
@@ -50,7 +50,7 @@ angular.module('LunApp', [])
     
     $http({
       headers: {'Content-Type': 'application/json'},
-      url: 'cgi-bin/json_list.py',
+      url: '/cgi-bin/json_list.py',
       method: "GET",
       params: {
         'path': film.pathname
