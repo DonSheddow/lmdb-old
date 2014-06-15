@@ -29,7 +29,7 @@ html, body {
   position: fixed;
   top: 2%;
   left: 225px;
-  max-height: 97%;
+  max-height: 98%;
 }
 
 #title{
@@ -42,6 +42,7 @@ html, body {
 
 #inner_display{
   position: relative;
+  max-width: 99%;
 }
 
 #info_list{
