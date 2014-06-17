@@ -78,7 +78,7 @@ html, body {
 }
 
 #imdbrating{
-  background-image: url(/icons/star.png);
+  background-image: url(/icons/lmdb/star.png);
   background-repeat: no-repeat;
   height: 57px;
   width: 65px;

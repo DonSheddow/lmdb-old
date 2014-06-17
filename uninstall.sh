@@ -1,27 +1,31 @@
 #!/bin/bash
 
-sudo rm /var/www/films
-sudo rm -r /var/www/images
+if [ $UID -ne 0 ]; then
+  echo "This script must be run as root"
+  exit 1
+fi
 
-for i in images/icons/*; do
-  sudo rm "/usr/share/apache2/icons/${i##*/}"
-done
+CGI_DIR=$(cat /etc/lmdb/cgi_dir.txt)
+ICON_DIR=$(cat /etc/lmdb/icon_dir.txt)
+DOCUMENT_ROOT=$(cat /etc/lmdb/document_root.txt)
 
-for i in html/*; do
-  sudo rm "/var/www/lmdb/${i##*/}"
-done
+rm -rv $CGI_DIR/lmdb
+rm -rv $ICON_DIR/lmdb
+rm -rv $DOCUMENT_ROOT/lmdb
 
-for i in cgi-bin/*; do
-  sudo rm "/usr/lib/cgi-bin/${i##*/}"
-done
+rm -rv /etc/lmdb
+rm -rv /opt/lmdb
 
-p="$(pwd)/db_syncd.py"
-( crontab -l 2>/dev/null | grep -Fv "$p" ) | crontab
-
+( crontab -l 2>/dev/null | grep -Fv "/opt/lmdb/db_syncd_wrapper.sh" ) | crontab
 kill "$(cat /tmp/lmdb.pid)"
 
-sudo rm /var/log/lmdb.log
-sudo rm /tmp/lmdb.pid
-sudo rm /tmp/lmdb.out
+rm -v /var/log/lmdb.log
+rm -v /tmp/lmdb.out
+rm -v /tmp/lmdb.pid
 
-dropdb lmdb
+su postgres <<-EOF
+  dropdb lmdb
+  dropuser lmdb
+EOF
+
+deluser lmdb

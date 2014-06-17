@@ -62,7 +62,8 @@ class EventHandler(pyinotify.ProcessEvent):
 handler = EventHandler()
 notifier = pyinotify.Notifier(wm, handler)
 
-src_dir = os.readlink("/var/www/films")
+with open("/etc/lmdb/src_dir.txt") as f:
+  src_dir = f.readline().strip()
 wdd = wm.add_watch(src_dir, mask)
 
 notifier.loop(daemonize=True, stdout='/tmp/lmdb.out', stderr='/tmp/lmdb.out', pid_file='/tmp/lmdb.pid')

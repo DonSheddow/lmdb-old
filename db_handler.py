@@ -1,28 +1,23 @@
 import psycopg2
-import re
 import os
 
-from PIL import Image
 from urllib import urlretrieve
 
 import datafetcher
 
 conn = psycopg2.connect("dbname=lmdb")
 
+def document_root():
+  with open("/etc/lmdb/document_root.txt") as f:
+    return f.readline().strip()
 
 def fetch_images(url, film_id):
-  poster = '/var/www/images/'+str(film_id)+'.jpg'
-  thumbnail = '/var/www/images/'+str(film_id)+'-thumbnail.jpg'
-  
+  img_path = document_root()+'/lmdb/images/'+str(film_id)+'.jpg'
   try:
-    urlretrieve(url, poster)
+    urlretrieve(url, img_path)
   except:
-    os.symlink('/var/www/images/no_poster.jpg', poster)
+    os.symlink(document_root()+'/lmdb/images/no_poster.jpg', img_path)
   
-  img = Image.open(poster)
-  img.thumbnail((80,80), Image.ANTIALIAS)
-  img.save(thumbnail)
-
 def add_actors(actors, film_id):
   cur = conn.cursor()
   for actor, character, order in actors:
@@ -92,13 +87,9 @@ def delete(pathname):
   cur.execute("SELECT id FROM films WHERE pathname = %s", [pathname])
   film_id = cur.fetchone()[0]
   
-  poster = '/var/www/images/'+str(film_id)+'.jpg'
+  poster = document_root()+'/lmdb/images/'+str(film_id)+'.jpg'
   if os.path.isfile(poster):
     os.remove(poster)
-  
-  thumbnail = '/var/www/images/'+str(film_id)+'-thumbnail.jpg'
-  if os.path.isfile(thumbnail):
-    os.remove(thumbnail)
   
   cur.execute("DELETE FROM films WHERE id = %s", [film_id])
   conn.commit()
@@ -121,60 +112,3 @@ def rename(pathname, new_pathname):
   cur.close()
   
  
-def initialize(src_dir):
-  src_dir = os.path.abspath(src_dir)
-  
-  cur = conn.cursor()
-  cur.execute("CREATE TYPE type AS ENUM(%s, %s)", ['movie', 'series'])
-  cur.execute("""CREATE TABLE films (pathname varchar(256) UNIQUE NOT NULL,
-                                     id SERIAL PRIMARY KEY,
-                                     title text,
-                                     start_year smallint, 
-                                     end_year smallint,
-                                     plot text,
-                                     imdbid char(9),
-                                     type type,
-                                     awards text,
-                                     metascore smallint,
-                                     imdbrating real,
-                                     tomatometer smallint,
-                                     tomatoconsensus text,
-                                     tomatousermeter smallint,
-                                     tomatoimage text
-                                    )
-              """)
-  
-  cur.execute("""CREATE TABLE genres (
-                                      film_id integer REFERENCES films ON DELETE CASCADE,
-                                      genre text
-                                     )
-              """)
-  
-  cur.execute("""CREATE TABLE people (
-                                      id SERIAL PRIMARY KEY,
-                                      name text UNIQUE NOT NULL
-                                     )
-              """)
-  
-  cur.execute("""CREATE TABLE performances (
-                                            film_id integer REFERENCES films ON DELETE CASCADE,
-                                            actor_id integer REFERENCES people,
-                                            character text,
-                                            order_of_appearance integer
-                                           )
-              """)
-  
-  cur.execute("""CREATE TABLE crew (
-                                    film_id integer REFERENCES films ON DELETE CASCADE,
-                                    crewmember_id integer REFERENCES people,
-                                    department text
-                                   )
-              """)
-  
-  conn.commit()
-  cur.close()
-  
-  for f in os.listdir(src_dir):
-    create(f)
-
-

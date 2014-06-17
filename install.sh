@@ -5,41 +5,82 @@
 # apache2
 #   libapache2-mod-python
 #
-# psql
-#   postgres role $USER with createdb priviliges
+# postgresql
 #
 # python
 #   psycopg2
 #   pyinotify
-#   PIL (Python Image Library)
 # 
 
-if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <src_dir>"
+if [ -d /opt/lmdb ]; then
+  echo "lmdb seems to be installed already. Aborting... "
   exit 1
 fi
 
-src_dir="$1"
+if [ $# -lt 1 ]; then
+  echo "Usage: $0 <src_dir>"
+  exit 1
+fi; src_dir=$1
 
-createdb lmdb
-mkdir /var/www/lmdb
+if [ ! -d "$src_dir" ]; then
+  echo "'$src_dir' is not a directory"
+  exit 1
+fi
 
-sudo ln -vs "$src_dir" /var/www/films
-sudo mkdir -v /var/www/images
-sudo chmod a+w /var/www/images
+if [ $UID -ne 0 ]; then
+  echo "$0 must be run as root"
+  exit 1
+fi
 
-sudo cp -v images/no_poster.jpg /var/www/images/
-sudo cp -v images/icons/* /usr/share/apache2/icons/
+if [ -z "$CGI_DIR" ]; then
+  CGI_DIR=/usr/lib/cgi-bin
+fi
+if [ -z "$ICON_DIR" ]; then
+  ICON_DIR=/usr/share/apache2/icons
+fi
+if [ -z "$DOCUMENT_ROOT" ]; then
+  DOCUMENT_ROOT=/var/www
+fi
 
-sudo cp -v html/* /var/www/lmdb/
-sudo cp -v cgi-bin/* /usr/lib/cgi-bin/
+mkdir -v /etc/lmdb
+mkdir -v /opt/lmdb
+mkdir -vp $DOCUMENT_ROOT/lmdb/images
+mkdir -v $CGI_DIR/lmdb
+mkdir -v $ICON_DIR/lmdb
 
-sudo touch /var/log/lmdb.log
-sudo chmod -v a+w /var/log/lmdb.log
+echo "$CGI_DIR" > /etc/lmdb/cgi_dir.txt
+echo "$ICON_DIR" > /etc/lmdb/icon_dir.txt
+echo "$DOCUMENT_ROOT" > /etc/lmdb/document_root.txt
+echo "$src_dir" > /etc/lmdb/src_dir.txt
 
-python -c "import db_handler; db_handler.initialize('${src_dir//\'/\\\'}')"
+cp -v datafetcher.py /opt/lmdb/
+cp -v db_handler.py /opt/lmdb/
+cp -v db_syncd.py /opt/lmdb/
+cp -v db_syncd_wrapper.sh /opt/lmdb/
+cp -v dbctl.py /opt/lmdb/
 
-p="$(pwd)/db_syncd.py"
-python "$p"
-( crontab -l 2>/dev/null | grep -Fv "$p" ; echo "@reboot python '$p'" ) | crontab
+ln -vs "$src_dir" $DOCUMENT_ROOT/lmdb/films
+
+cp -v html/* $DOCUMENT_ROOT/lmdb/
+cp -v images/no_poster.jpg $DOCUMENT_ROOT/lmdb/images/
+cp -v images/icons/* $ICON_DIR/lmdb/
+cp -v cgi-bin/* $CGI_DIR/lmdb/ 
+
+touch /var/log/lmdb.log
+
+adduser --system --no-create-home lmdb
+chown lmdb /var/log/lmdb.log
+chown lmdb $DOCUMENT_ROOT/lmdb/images
+
+su -s /bin/bash postgres <<-EOF
+  createuser lmdb
+  createdb lmdb
+EOF
+ 
+su -s /bin/bash lmdb <<-EOF
+  python initialize_db.py "$src_dir"
+  psql "dbname=lmdb" -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO "www-data"'
+  python /opt/lmdb/db_syncd.py
+  ( crontab -l 2>/dev/null; echo "@reboot /opt/lmdb/db_syncd_wrapper.sh" ) | crontab
+EOF
 
