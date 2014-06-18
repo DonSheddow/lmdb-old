@@ -4,7 +4,10 @@ import os
 from re import sub
 from urllib import quote, unquote
 
-offset = len('/var/www/films/')
+with open("/etc/lmdb/document_root.txt") as f:
+  DOCUMENT_ROOT = f.readline().strip()
+
+offset = len(DOCUMENT_ROOT+'/lmdb/films/')
 
 def print_files(path):
   if os.path.isfile(path):
@@ -19,6 +22,6 @@ print
 
 form = cgi.FieldStorage()
 
-path = '/var/www/films/'+sub(r'\.\.', '', unquote(form.getfirst('path')))
+path = DOCUMENT_ROOT+'/lmdb/films/'+sub(r'\.\.', '', unquote(form.getfirst('path')))
 
 print_files(path)
