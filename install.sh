@@ -73,8 +73,8 @@ chown lmdb /var/log/lmdb.log
 chown lmdb $DOCUMENT_ROOT/lmdb/images
 
 su -s /bin/bash postgres <<-EOF
-  createuser lmdb
-  createdb lmdb
+  createuser --no-createdb --no-createrole --no-superuser lmdb
+  createdb --owner=lmdb lmdb
 EOF
  
 su -s /bin/bash lmdb <<-EOF
