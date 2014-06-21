@@ -17,10 +17,19 @@ if [ -d /opt/lmdb ]; then
   exit 1
 fi
 
-if [ $# -lt 1 ]; then
-  echo "Usage: $0 <src_dir>"
+restore_data=false
+for i in "$@"; do
+  if [ "$i" == "--restore-data" ]; then
+    restore_data=true
+  else
+    src_dir="$i"
+  fi
+done
+
+if [ -z "$src_dir" ]; then
+  echo "Usage: $0 [--restore-data] <src_dir>"
   exit 1
-fi; src_dir=$1
+fi
 
 if [ ! -d "$src_dir" ]; then
   echo "'$src_dir' is not a directory"
@@ -78,9 +87,16 @@ su -s /bin/bash postgres <<-EOF
 EOF
  
 su -s /bin/bash lmdb <<-EOF
-  python initialize_db.py "$src_dir"
-  psql "dbname=lmdb" -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO "www-data"'
+  psql -f initialize_db.sql 
+  psql -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO "www-data"'
+  
+  if [ "$restore_data" == "true" ]; then
+    psql -f /tmp/lmdb_data.sql
+    tar xzf /tmp/lmdb_images.tar.gz -C "$DOCUMENT_ROOT/lmdb/images/"
+  else
+    python add_films.py "$src_dir"
+  fi
+  
   python /opt/lmdb/db_syncd.py
   ( crontab -l 2>/dev/null; echo "@reboot /opt/lmdb/db_syncd_wrapper.sh" ) | crontab
 EOF
-

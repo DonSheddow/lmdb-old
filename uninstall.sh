@@ -9,6 +9,11 @@ CGI_DIR=$(cat /etc/lmdb/cgi_dir.txt)
 ICON_DIR=$(cat /etc/lmdb/icon_dir.txt)
 DOCUMENT_ROOT=$(cat /etc/lmdb/document_root.txt)
 
+if [ "$1" == "--save-data" ]; then
+  cd "$DOCUMENT_ROOT/lmdb/images"; tar czf /tmp/lmdb_images.tar.gz *; cd -
+  su -s /bin/bash lmdb -c "pg_dump --data-only > /tmp/lmdb_data.sql"
+fi
+
 rm -rv $CGI_DIR/lmdb
 rm -rv $ICON_DIR/lmdb
 rm -rv $DOCUMENT_ROOT/lmdb
