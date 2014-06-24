@@ -98,5 +98,5 @@ su -s /bin/bash lmdb <<-EOF
   fi
   
   python /opt/lmdb/db_syncd.py
-  ( crontab -l 2>/dev/null; echo "@reboot /opt/lmdb/db_syncd_wrapper.sh" ) | crontab
+  ( crontab -l 2>/dev/null | grep -Fv "/opt/lmdb/db_syncd_wrapper.sh"; echo "@reboot /opt/lmdb/db_syncd_wrapper.sh" ) | crontab
 EOF
