@@ -11,18 +11,25 @@ import db_handler
 logging.basicConfig(filename='/var/log/lmdb.log', format='[%(asctime)s] %(message)s', level=logging.INFO, datefmt='%c')
 
 def rename(src, target):
+  src = os.path.basename(src)
+  target = os.path.basename(target)
+  
   logging.info('Renaming %s ...', src)
-  db_handler.rename(os.path.basename(src), os.path.basename(target))
+  db_handler.rename(src, target)
   logging.info('... to %s', target)
 
 def delete(path):
+  path = os.path.basename(path)
+  
   logging.info('Deleting %s ...', path)
-  db_handler.delete(os.path.basename(path))
+  db_handler.delete(path)
   logging.info('... deleted %s', path)
   
 def create(path):
+  path = os.path.basename(path)
+  
   logging.info('Creating %s ...', path)
-  db_handler.create(os.path.basename(path))
+  db_handler.create(path)
   logging.info('... created %s', path)
 
 # Deletes files that are moved out of the directory
