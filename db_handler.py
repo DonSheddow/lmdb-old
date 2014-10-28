@@ -99,7 +99,8 @@ def delete(pathname):
 def rename(pathname, new_pathname):
   cur = conn.cursor()
   cur.execute("SELECT id, imdbid FROM films WHERE pathname = %s", [pathname])
-  film_id, current_imdbid = cur.fetchone()
+  result = cur.fetchone()
+  film_id, current_imdbid = result if result else (None, None)
   
   new_imdbid = datafetcher.search(new_pathname)
   if new_imdbid == current_imdbid:
