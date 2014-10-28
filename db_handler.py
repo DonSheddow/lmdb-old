@@ -85,7 +85,10 @@ def create(pathname, data=None):
 def delete(pathname):
   cur = conn.cursor()
   cur.execute("SELECT id FROM films WHERE pathname = %s", [pathname])
-  film_id = cur.fetchone()[0]
+  result = cur.fetchone()
+  if not result:
+    return
+  film_id = result[0]
   
   poster = document_root()+'/lmdb/images/'+str(film_id)+'.jpg'
   if os.path.isfile(poster):
