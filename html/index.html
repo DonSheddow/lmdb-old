@@ -53,10 +53,10 @@
     <div id="film_listing">
       <ul ng-repeat="(dir, files) in listing">
         <li class="header">
-          <a href="vlc://{{domain}}/films/{{dir}}">{{decodeURL(dir)}}</a>
+          <a href="vlc://{{domain}}/lmdb/films/{{dir}}">{{decodeURL(dir)}}</a>
         </li>
         <li ng-repeat="file in files">
-          <a href="vlc://{{domain}}/films/{{dir}}/{{file}}">{{decodeURL(file)}}</a>
+          <a href="vlc://{{domain}}/lmdb/films/{{dir}}/{{file}}">{{decodeURL(file)}}</a>
         </li>
       </ul>
     </div>
