@@ -27,7 +27,7 @@ html, body {
 
 #main_display{
   position: fixed;
-  top: 2%;
+  top: 0%;
   left: 225px;
   max-height: 98%;
 }
