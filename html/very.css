@@ -2,6 +2,9 @@ html, body {
   margin: 0;
   height: 100%;
 }
+body {
+  background-image: linear-gradient(to right, #BDC3C7, #7F8C8D);
+}
 .clearfix{
   overflow: auto;
 }
